@@ -1,3 +1,5 @@
+'use strict';
+
 var config = {
   RAINBOW: false,
   trys: 12,
@@ -26,8 +28,11 @@ var config = {
   }
 }
 
-var Vector = VectorConstructor()
-var Vow = VowConstructor()
+// todo item class for extra sweetness
+// ConstrucorFunction.call(this)
+
+var Vector = VectorClass()
+var Vow = VowClass()
 
 function game(){
   //Booleans
@@ -109,7 +114,7 @@ function game(){
         ctx.strokeStyle = 'rgba(204, 240, 240, 1)'
         ctx.lineCap = 'round'
         ctx.lineWidth = 0.5
-        var wind = _.force.wind.dupl()
+        var wind = _.force.wind.copy()
         wind.x *= 70
         _.wind.parts.forEach(function(part){
           ctx.beginPath()
@@ -143,7 +148,7 @@ function game(){
         _.launchInfos.start.x - _.launchInfos.end.x === 0
         && _.launchInfos.start.y - _.launchInfos.end.y === 0
       ) return
-      _.launchInfos.start = _.ball.poz.dupl()
+      _.launchInfos.start = _.ball.poz.copy()
       if(!launched) {
         _.launchInfos.start.sub(_.launchInfos.end)
         _.force.launch = new Vector(_.launchInfos.start.x, _.launchInfos.start.y)
@@ -329,7 +334,7 @@ function game(){
     _.bin.hitbox.r.dw.scale(ratio)
 
 
-    for(i =0; i < 150; i++){
+    for(var i = 0; i < 150; i++){
       var min = 0
       var maxX = ctx.canvas.width
       var maxY = ctx.canvas.height
@@ -400,17 +405,17 @@ function game(){
       }
     }
 
-    for(direction in hitbox){
+    for(var direction in hitbox){
       if(direction === 'top') continue
       var dir = hitbox[direction]
-      var line = dir.dw.dupl().sub(dir.up)
-      var ballToTopLine = _.ball.poz.dupl().sub(dir.up)
+      var line = dir.dw.copy().sub(dir.up)
+      var ballToTopLine = _.ball.poz.copy().sub(dir.up)
       var projected = line.project(ballToTopLine).add(dir.up)
-      var distance = projected.dupl().sub(_.ball.poz).magn()
+      var distance = projected.copy().sub(_.ball.poz).magn()
 
       if(_.ball.poz.y > hitbox.top - radius){
         if(distance < radius && !bounced){
-          var bounceDir = projected.dupl().sub(_.ball.poz).normalize().inverse()
+          var bounceDir = projected.copy().sub(_.ball.poz).normalize().inverse()
           if(_.ball.vel.x < 0) _.ball.vel.x *= -1
           _.ball.vel.y *= bounceDir.y
           _.ball.vel.x *= bounceDir.x
@@ -436,7 +441,7 @@ function game(){
 window.onload = game
 
 // Constructors
-function VectorConstructor(){
+function VectorClass(){
   var Vector = function(x, y){
     this.x = x || 0
     this.y = y || 0
@@ -475,17 +480,17 @@ function VectorConstructor(){
     return Math.atan2(this.y, this.x)
   }
   Vector.prototype.project = function(vect){
-    return this.dupl().scale(this.product(vect)/(this.magn() * this.magn()))
+    return this.copy().scale(this.product(vect)/(this.magn() * this.magn()))
   }
   Vector.fromAngle = function(radians){
     return new Vector(Math.cos(radians), Math.sin(radians))
   }
-  Vector.prototype.dupl = function(){
+  Vector.prototype.copy = function(){
     return new Vector(this.x, this.y)
   }
   return Vector
 }
-function VowConstructor(){
+function VowClass(){
   var Vow = function(fn){
     var that = this
     this.thens = []
