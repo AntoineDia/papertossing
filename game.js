@@ -29,7 +29,9 @@ var config = {
 }
 
 // todo item class for extra sweetness
-// ConstrucorFunction.call(this)
+// ConstrucorFunction.call(this) for calling coonstructor in other context
+// Object.create(ConstrucorFunction.prototype) duplicate constructor
+// ConstrucorFunction.prototype.constructor = ConstrucorFunction
 
 var Vector = VectorClass()
 var Vow = VowClass()
@@ -173,7 +175,7 @@ function game(){
   function setup(){
     return new Vow(function(resolve, rej){
       // HTML
-      var $box = document.getElementById('box')
+      var $box = document.getElementById('box-game-panel')
       var $canvas = document.createElement('canvas')
       $canvas.width = $box.clientWidth
       $canvas.height = $box.clientHeight
