@@ -1,20 +1,17 @@
 var configuration = {
-  RAINBOW: false,
+  raninbow: false,
   trys: 12,
   randomBall: true,
-  assets: {
-    // Array
-    ball: [
-      './assets/paper.png',
-      './assets/basketball.png',
-      './assets/tennisball.png',
-      './assets/voleyball.png',
-      './assets/football.png',
-    ],
-    bin: {
-      front: './assets/binfront.png',
-      back: './assets/binback.png',
-    }
+  ball: [
+    './assets/paper.png',
+    './assets/basketball.png',
+    './assets/tennisball.png',
+    './assets/voleyball.png',
+    './assets/football.png',
+  ],
+  bin: {
+    front: './assets/binfront.png',
+    back: './assets/binback.png',
   },
   size: {
     ball: 75,
@@ -31,12 +28,11 @@ function game(params){
   // Classes
   var Vector = VectorClass()
   var Item = ItemClass()
+  var Ball = BallClass()
+  var Bin = BinClass()
 
   // Globals
-  var ctx
-
-  var ballImg = document.getElementById('ballImg')
-  var i = new Item(ballImg, 50, 50, 50)
+  var ctx, currentBall, balls, bin
 
   function setup(){
     var $box = document.getElementById('box-game-panel')
@@ -45,10 +41,21 @@ function game(params){
     $canvas.height = $box.clientHeight
     $box.appendChild($canvas)
     ctx = $canvas.getContext('2d')
+
+    currentBall = 0
+    balls = []
+    params.ball.forEach(function(ball){
+      balls.push(new Ball(ball, 100, 100, params.size.ball))
+    })
+    bin = new Bin({
+      front: params.bin.front,
+      back: params.bin.back
+    }, 100, 100, params.size.bin)
   }
 
   function draw(){
-    i.draw()
+    // ball.draw()
+    // console.log(ball)
   }
 
   setup()
@@ -83,8 +90,9 @@ function game(params){
     return Vector
   }
   function ItemClass(){
-    var Item = function(img, x, y, w, h){
-      this.img = img
+    var Item = function(imgSrc, x, y, w, h){
+      this.img = new Image()
+      if(typeof imgSrc === 'String') this.img.src = imgSrc
       Vector.call(this, x, y)
       this.w = w
       this.h = h || w
@@ -93,10 +101,45 @@ function game(params){
     Object.defineProperty(Item.prototype, "constructor", {value: Item})
 
     Item.prototype.draw = function(){
+      if(!this.img.complete || this.img.naturalWidth === 0)
+        this.img.onload = this.draw.bind(this)
       ctx.drawImage(this.img, this.x - this.w/2, this.y - this.h/2, this.w, this.h)
     }
     return Item
   }
+  function BallClass(){
+    var Ball = function(imgSrc, x, y, w){
+      Item.call(this, imgSrc, x, y, w)
+      this.r = this.w / 2
+      this.vel = new Vector()
+      this.acc = new Vector()
+      this.launched = false
+      this.falled = false
+      this.bounced = false
+    }
+    Ball.prototype = Object.create(Item.prototype)
+    Object.defineProperty(Ball.prototype, "constructor", {value: Ball})
+    return Ball
+  }
+  function BinClass(){
+    var Bin = function(imgSrc, x, y, w){
+      Item.call(this, imgSrc, x, y, w)
+      this.r = this.w / 2
+      this.vel = new Vector()
+      this.acc = new Vector()
+    }
+    Bin.prototype = Object.create(Item.prototype)
+    Object.defineProperty(Bin.prototype, "constructor", {value: Bin})
+    return Bin
+  }
 }
 
-window.onload = function(){ game(configuration) }
+var isIE = !!window.MSInputMethodContext && !!document.documentMode
+if(isIE){
+  var $script = document.createElement('script')
+  $script.src = 'https://cdn.polyfill.io/v3/polyfill.min.js'
+  document.body.appendChild($script)
+  $script.onload = function(){ game(configuration) }
+} else {
+  window.onload = function(){ game(configuration) }
+}
