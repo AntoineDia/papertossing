@@ -37,6 +37,12 @@ var Vector = VectorClass()
 var Vow = VowClass()
 
 function game(){
+  // Wind asset
+  var wind1 = new Image()
+  var windSrc = "https://img.icons8.com/ios-glyphs/50/000000/wind.png"
+  wind1.src = windSrc
+  var wind2 = wind1.cloneNode()
+  wind1.style.transform = 'scaleX(-1)'
   //Booleans
   var launched, endTry, falled, special, timedOut, bounced, debounceFall
   // Numbers
@@ -381,16 +387,30 @@ function game(){
     if(windComprenhensible !== 0) windComprenhensible = (windComprenhensible -20) * 3
     var txt = ''
     switch(windComprenhensible){
-      case 0: txt = 'PAS DE VENT'
+      case 0:
+        txt = 'PAS DE VENT'
         break;
-      case 30: txt = '. PETIT VENT .'
+      case 30:
+        txt = 'PETIT VENT'
         break;
-      case 60: txt = '! MOYEN VENT !'
+      case 60:
+        txt = 'MOYEN VENT'
         break;
-      case 90: txt = '!! GRAND VENT !!'
+      case 90:
+        txt = 'GRAND VENT'
        break;
     }
-    document.getElementById('wind').innerHTML = txt
+    var $span = document.createElement('span')
+    $span.innerHTML = txt
+    var $wind = document.getElementById('wind')
+    wind.innerHTML = ''
+    if(windComprenhensible){
+      $wind.appendChild(wind1)
+      $wind.appendChild($span)
+      $wind.appendChild(wind2)
+    } else {
+      $wind.appendChild($span)
+    }
   }
 
   function ballColision(){
