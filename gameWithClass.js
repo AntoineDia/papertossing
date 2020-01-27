@@ -54,8 +54,9 @@ function game(params){
   }
 
   function draw(){
-    // ball.draw()
-    // console.log(ball)
+    balls[currentBall].draw()
+    bin.drawBack()
+    bin.drawFront()
   }
 
   setup()
@@ -91,8 +92,19 @@ function game(params){
   }
   function ItemClass(){
     var Item = function(imgSrc, x, y, w, h){
-      this.img = new Image()
-      if(typeof imgSrc === 'String') this.img.src = imgSrc
+      switch(typeof imgSrc){
+        case 'string':
+          this.img = new Image()
+          this.img.src = imgSrc
+          break;
+        case 'object':
+          this.imgs = {}
+          Object.keys(imgSrc).forEach(function(name){
+            this.imgs[name] = new Image()
+            this.imgs[name].src = imgSrc[name]
+          }.bind(this))
+          break;
+      }
       Vector.call(this, x, y)
       this.w = w
       this.h = h || w
@@ -130,6 +142,19 @@ function game(params){
     }
     Bin.prototype = Object.create(Item.prototype)
     Object.defineProperty(Bin.prototype, "constructor", {value: Bin})
+
+
+    Bin.prototype.drawFront = function(){
+      this.img = this.imgs.front
+      this.draw()
+    }
+    Bin.prototype.drawBack = function(){
+      if(this.w === this.h){
+        this.h = this.w / (this.imgs.front.width / this.imgs.front.height)
+      }
+      this.img = this.imgs.back
+      this.draw()
+    }
     return Bin
   }
 }
