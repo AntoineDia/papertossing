@@ -387,23 +387,29 @@ function game(){
     if(windComprenhensible !== 0) windComprenhensible = (windComprenhensible -20) * 3
     var txt = ''
     switch(windComprenhensible){
-      case 0:
-        txt = 'PAS DE VENT'
+      case 0: txt = 'PAS DE VENT'
         break;
-      case 30:
-        txt = 'PETIT VENT'
+      case 30: txt = 'PETIT VENT'
         break;
-      case 60:
-        txt = 'MOYEN VENT'
+      case 60: txt = 'MOYEN VENT'
         break;
-      case 90:
-        txt = 'GRAND VENT'
+      case 90: txt = 'GRAND VENT'
        break;
     }
     var $span = document.createElement('span')
     $span.innerHTML = txt
     var $wind = document.getElementById('wind')
     wind.innerHTML = ''
+    switch(windComprenhensible){
+      case 0: $span.style.fontSize = '25px'
+        break;
+      case 30: $span.style.fontSize = '30px'
+        break;
+      case 60: $span.style.fontSize = '35px'
+        break;
+      case 90: $span.style.fontSize = '40px'
+       break;
+    }
     if(windComprenhensible){
       $wind.appendChild(wind1)
       $wind.appendChild($span)

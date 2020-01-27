@@ -76,6 +76,9 @@ html, body{
   height: 25px;
   margin: 0 10px;
 }
+.gameInfos * {
+  transition: .2s ease-in-out;
+}
 #hitbox{
   background-color: white;
   position: fixed;
