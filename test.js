@@ -32,8 +32,8 @@ function game(){
   var balls, iBall, bin, binBounced = false, timedOut = null, endGame = false
   var forces = {
     gravity: new Vector(0, 0.11),
-    wind: new Vector(0.02, 0),
-    launch: new Vector(0, -1)
+    wind: new Vector(0, 0),
+    launch: new Vector(0, 0)
   }
   var launchInfos = {
     start: new Vector(0,0),

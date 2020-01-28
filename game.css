@@ -119,3 +119,9 @@ html, body{
   transform: translate(-50%);
   z-index: 5;
 }
+#logo{
+  position: fixed;
+}
+#logo img{
+  width: 100px;
+}
