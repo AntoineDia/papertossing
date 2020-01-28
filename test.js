@@ -1,5 +1,5 @@
 var config = {
-  tries: 10,
+  tries: 8,
   randomBall: true,
   seeHitbox: false,
   ball: {
@@ -27,6 +27,7 @@ var config = {
 
 function game(){
   'use strict';
+  var now, then, elapsed
   var score, tries
   var ctx, assets
   var balls, iBall, bin, binBounced = false, timedOut = null, endGame = false
@@ -107,22 +108,22 @@ function game(){
   function updateDOM(){
     var $tries = document.getElementById('tries')
     $tries.innerHTML = ''
-    for(var i = balls.length-1; i >= 0; i--){
-      if(i +1 === config.tries /2){
-        var $div = document.createElement('div')
-        $div.style.flexBasis = '100%'
-        $tries.appendChild($div)
-      }
+    var $ballIndicator = document.createElement('div')
+    $ballIndicator.style.borderRadius = '100%'
+    $ballIndicator.style.border = '1.5px solid black'
+    for(var i = 0; i < balls.length; i++){
+      var $current = $ballIndicator.cloneNode()
       if(i < iBall){
-        var tempBall = assets.emptyBall.cloneNode()
-      } else {
-        var tempBall = balls[i].img.cloneNode()
+        if(balls[i].scored) $current.style.backgroundColor = 'green'
+        else $current.style.backgroundColor = 'red'
+      } else if(i === iBall) {
+        $current.style.backgroundColor = 'black'
       }
-      tempBall.style.width = '20px'
-      tempBall.style.height = '20px'
-      $tries.appendChild(tempBall)
+      $current.style.width = '20px'
+      $current.style.height = '20px'
+      $tries.appendChild($current)
     }
-    document.getElementById('score').innerHTML = score
+    // document.getElementById('score').innerHTML = score
 
     var windComprenhensible = Math.abs(Math.floor(forces.wind.x * 10000) / 10)
     if(windComprenhensible !== 0) windComprenhensible = (windComprenhensible -20) * 3
@@ -152,7 +153,8 @@ function game(){
        break;
     }
     if(endGame) {
-      $span.innerHTML = 'End Game</br> Final score: ' + score
+      $span.style.fontSize = '30px'
+      $span.innerHTML = 'End Game</br> Score: ' + score
     }
     $wind.appendChild($span)
   }
@@ -176,11 +178,20 @@ function game(){
     }
     wind.draw()
   }
-  function frame(){
-    if(endGame) return
-    draw()
-    balls[iBall].update()
+
+  function frame(timestamp){
     window.requestAnimationFrame(frame)
+    now = Date.now()
+    if (now - then > 1000/70) {
+      then = now
+      if(endGame) return
+      draw()
+      balls[iBall].update()
+    }
+  }
+  function startLoop() {
+    then = Date.now()
+    frame()
   }
   function initGame(){
     score = 0
@@ -217,7 +228,7 @@ function game(){
     }
     wind.newForce()
     updateDOM()
-    frame()
+    startLoop()
   }
   function setup(){
     return new Promise(function(resole, rej){
@@ -279,6 +290,7 @@ function game(){
     this.falled = false
     this.bounced = false
     this.finished = false
+    this.scored = false
     //vectors
     this.poz = new Vector(ctx.canvas.width/2, ctx.canvas.height - this.size)
     this.acc =  new Vector(0,0)
@@ -307,12 +319,12 @@ function game(){
       this.scored = true
       score++
     }
-    if(this.poz.y + this.radius > bin.poz.y + bin.height/2 && !this.scored){
+    if(this.poz.y + this.radius > bin.poz.y + bin.height/2 && !this.finished){
       this.vel.y *= -0.7
       this.poz.y -= 3
-      this.scored = true
+      this.finished = true
     }
-    if(this.scored){
+    if(this.scored || this.finished){
       if(!this.bounced){
         setTimeout(function(){
           resetTry()

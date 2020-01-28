@@ -76,7 +76,7 @@ html, body{
   display: flex;
   flex-wrap: wrap;
 }
-#tries img{
+#tries div{
   margin: 2px 5px;
 }
 .tries img:first-child{
