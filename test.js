@@ -114,7 +114,7 @@ function game(){
     for(var i = 0; i < balls.length; i++){
       var $current = $ballIndicator.cloneNode()
       if(i < iBall){
-        if(balls[i].scored) $current.style.backgroundColor = 'green'
+        if(balls[i].scored) $current.style.backgroundColor = 'chartreuse'
         else $current.style.backgroundColor = 'red'
       } else if(i === iBall) {
         $current.style.backgroundColor = 'black'
