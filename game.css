@@ -58,26 +58,58 @@ html, body{
   pointer-events: none;
 }
 .gameInfos{
-  left: 50%;
-  transform: translateX(-50%);
-  position: absolute;
-  width: max-content;
+  position: relative;
+  user-select: none;
 }
-.gameInfos div {
-  margin-top: 10px;
+.tries{
+  position: absolute;
+  top: 5px;
+  left: 5px;
   font-size: 25px;
   font-weight: bold;
-  color: black;
+  font-family: monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#tries{
+  display: flex;
+  flex-wrap: wrap;
+}
+#tries img{
+  margin: 2px 5px;
+}
+.tries img:first-child{
+  width: 30px;
+  height: 30px;
+}
+.score{
+  position: absolute;
+  top: -5px;
+  right: 5px;
+  font-size: 25px;
+  font-weight: bold;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.score img:first-child{
+  width: 35px;
+  height: 35px;
+}
+#score{
+  font-size: 30px;
+}
+.wind{
+  width: 100%;
   text-align: center;
   font-family: monospace;
-  background-color: rgba(255, 255, 255, 0.479);
-}
-.gameInfos img{
-  height: 25px;
-  margin: 0 10px;
-}
-.gameInfos * {
-  transition: .2s ease-in-out;
+  font-weight: bold;
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 #hitbox{
   background-color: white;

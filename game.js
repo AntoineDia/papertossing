@@ -1,5 +1,3 @@
-'use strict';
-
 var config = {
   RAINBOW: false,
   trys: 12,
