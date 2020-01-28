@@ -1,5 +1,5 @@
 var config = {
-  tries: 12,
+  tries: 10,
   randomBall: true,
   seeHitbox: false,
   ball: {
@@ -158,13 +158,10 @@ function game(){
   }
   function resetTry(){
     tries--
+    if(tries === 0) endGame = true
     iBall++
     wind.newForce()
-    if(tries === 0) endGame = true
     updateDOM()
-  }
-  function update(){
-    if(!endGame) balls[iBall].update()
   }
   function draw(){
     ctx.clearRect(0,0, ctx.canvas.width, ctx.canvas.height)
@@ -180,8 +177,9 @@ function game(){
     wind.draw()
   }
   function frame(){
+    if(endGame) return
     draw()
-    update()
+    balls[iBall].update()
     window.requestAnimationFrame(frame)
   }
   function initGame(){
