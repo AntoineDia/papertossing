@@ -1,6 +1,7 @@
 var config = {
   tries: 12,
   randomBall: true,
+  seeHitbox: false,
   ball: {
     width: 80,
     assets: [
@@ -409,6 +410,30 @@ function game(){
       this.poz.x - this.width/2 , this.poz.y - this.height/2,
       this.width, this.height
     )
+    if(config.seeHitbox){
+      ctx.strokeStyle = 'red'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.moveTo(
+        this.poz.x + this.hitbox.l.up.x - this.width / 2,
+        this.poz.y + this.hitbox.l.up.y - this.height / 2
+      )
+      ctx.lineTo(
+        this.poz.x + this.hitbox.l.dw.x - this.width / 2,
+        this.poz.y + this.hitbox.l.dw.y - this.height / 2,
+      )
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.moveTo(
+        this.poz.x + this.hitbox.r.up.x - this.width / 2,
+        this.poz.y + this.hitbox.r.up.y - this.height / 2
+      )
+      ctx.lineTo(
+        this.poz.x + this.hitbox.r.dw.x - this.width / 2,
+        this.poz.y + this.hitbox.r.dw.y - this.height / 2,
+      )
+      ctx.stroke()
+    }
   }
 }
 

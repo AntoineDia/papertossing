@@ -397,7 +397,7 @@ function game(){
     var $span = document.createElement('span')
     $span.innerHTML = txt
     var $wind = document.getElementById('wind')
-    wind.innerHTML = ''
+    $wind.innerHTML = ''
     switch(windComprenhensible){
       case 0: $span.style.fontSize = '25px'
         break;
