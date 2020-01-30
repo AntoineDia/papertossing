@@ -555,3 +555,79 @@ function VowClass(){
   }
   return Vow
 }
+
+
+function popup(url) {
+  var pops = window.open(
+    url,
+    'popUpWindow',
+    `
+      height=500, width=500,
+      left=100, top=100,
+      resizable=yes,
+      scrollbars=no,
+      toolbar=yes,
+      menubar=no,
+      location=no,
+      directories=no,
+      status=yes`
+  )
+}
+
+<iframe width="560" height="315"
+src="https://www.youtube-nocookie.com/embed/sr0ayFx4tBY"
+frameborder="0"
+allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+allowfullscreen></iframe>
+
+document.addEventListener('keyup',function(e){
+  if(e.keyCode !== 80) return
+  popup('https://www.youtube-nocookie.com/embed/sr0ayFx4tBY')
+})
+
+var originalUrl = 'https://www.youtube.com/watch?v=sr0ayFx4tBY'
+var popupUrl    = 'https://www.youtube.com/embed/sr0ayFx4tBY'
+
+function popup(url) {
+
+  var pops = window.open("", "", "width=200, height=100")
+
+  pops.document.write("<h1>A new window!</h1>")
+  pops.document.body.onblur = function(){
+    pops.document.body.focus()
+    pops.console.log('loose focus')
+  }
+
+/* tests */
+
+window.onfocus = function(){
+  this.console.log('focused')
+}
+
+function bodyBlur(){
+  var myWindow = window
+  setTimeout(function(){
+    myWindow.focus()
+  }, 500)
+}
+
+  // var pops = window.open(
+  //   url,
+  //   'popUpWindow',
+  //   `
+  //     height=500, width=500,
+  //     left=100, top=100,
+  //     resizable=yes,
+  //     scrollbars=no,
+  //     toolbar=no,
+  //     menubar=no,
+  //     location=no,
+  //     directories=no,
+  //     status=no`
+  // )
+  // pops.document.write("<h1>A new window!</h1>")
+  // pops.document.body.onblur = function(){
+  //   pops.focus()
+  //   pops.console.log('loose focus')
+  // }
+}

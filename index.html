@@ -13,16 +13,84 @@
   <div id="logo">
     <img src="https://pbs.twimg.com/profile_images/491905949351698432/eIQ2h9ke_400x400.jpeg" alt="logo">
   </div>
-  <div id="wrapper">
-    <div id="box-game-panel">
-      <div class="gameInfos">
-        <div class='wind'><span id='wind'></span></div>
-        <div class='tries'><div id='tries'></div></div>
-        <!-- <div class='score'><img src="https://img.icons8.com/cotton/64/000000/leaderboard--v2.png"><div id="score"></div></div> -->
+  <div id="contentWrapper">
+
+    <div class="buttonsHolder">
+      <div class="button" onclick="PaperToss()">Paper-toss</div>
+      <div class="button" onclick="Penalty()">Penalty</div>
+      <div class="button" onclick="Basket()">Basket</div>
+    </div>
+
+    <div class="boxHolder">
+      <div id="box-game-panel">
+        <!-- The magic is here -->
       </div>
     </div>
-  </div>
 
+    <script>
+      var $box = document.getElementById('box-game-panel')
+      function PaperToss(){
+        $box.innerHTML = ''
+        game({
+          tries: 8,
+          randomBall: true,
+          seeHitbox: false,
+          background: './assets/office.jpg',
+          ball: {
+            width: 80,
+            assets: [
+              './assets/paper.png',
+              './assets/basketball.png',
+              './assets/tennisball.png',
+              './assets/voleyball.png',
+              './assets/football.png',
+            ],
+          },
+          bin: {
+            width: 90,
+            assets: [
+              './assets/binfront.png',
+              './assets/binback.png',
+            ],
+            type: 'top',
+            hitbox: {
+              top:    { x:  3, y:  39 },
+              bottom: { x: 63, y: 410 }
+            }
+          }
+        })
+      }
+      function Penalty(){
+        $box.innerHTML = ''
+        game({
+          tries: 8,
+          randomBall: false,
+          seeHitbox: false,
+          background: './assets/field.jpg',
+          ball: {
+            width: 80,
+            assets: ['./assets/football2.png']
+          },
+          bin: {
+            type: 'front',
+            width: 300,
+            assets: [
+              './assets/goal.png'
+            ],
+          },
+          keeper:{
+            width: 100,
+            assets: ['./assets/keeperscrop.png']
+          }
+        })
+      }
+      function Basket(){
+        $box.innerHTML = ''
+        alert('See you in the future \n youtu.be/mpMg1upld0w')
+      }
+    </script>
+
+  </div>
 
   <!-- <script src="./game.js"></script> -->
   <script src="./test.js"></script>

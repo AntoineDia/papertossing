@@ -25,12 +25,13 @@ var config = {
   }
 }
 
-function game(){
+function game(config){
   'use strict';
   var now, then, elapsed
   var score, tries
   var ctx, assets
-  var balls, iBall, bin, binBounced = false, timedOut = null, endGame = false
+  var balls, iBall, bin, keeper, binBounced = false, timedOut = null, endGame = false
+  var difficultyLevel = null
   var forces = {
     gravity: new Vector(0, 0.11),
     wind: new Vector(0, 0),
@@ -74,11 +75,18 @@ function game(){
   }
   var wind = {
     newForce: function(){
-      var min = 3
-      var max = 5
-      var windForce = Math.floor(Math.random() * (max - min + 1)) + min
-      forces.wind = new Vector(windForce/100,0)
-      if(Math.random() >= 0.5) forces.wind.x *= -1
+      if(difficultyLevel === null){
+        forces.wind.scale(0)
+      } else if(difficultyLevel === 3){
+        var min = 3
+        var max = 5
+        var windForce = Math.floor(Math.random() * (max - min + 1)) + min
+        forces.wind = new Vector(windForce/100,0)
+        if(Math.random() >= 0.5) forces.wind.x *= -1
+      } else {
+        forces.wind = new Vector((difficultyLevel + 3)/100,0)
+        if(Math.random() >= 0.5) forces.wind.x *= -1
+      }
     },
     parts: [],
     draw: function(){
@@ -160,7 +168,14 @@ function game(){
   }
   function resetTry(){
     tries--
-    if(tries === 0) endGame = true
+    if(tries === 0){
+      endGame = true
+      var $canvas = document.querySelector('#box-game-panel canvas')
+      $canvas.removeEventListener('mousedown', events.start)
+      $canvas.removeEventListener('mouseup', events.end)
+      $canvas.removeEventListener('touchstart', events.start)
+      $canvas.removeEventListener('touchend', events.end)
+    }
     iBall++
     wind.newForce()
     updateDOM()
@@ -169,17 +184,18 @@ function game(){
     ctx.clearRect(0,0, ctx.canvas.width, ctx.canvas.height)
     if(balls[iBall].falled){
       bin.draw('back')
+      if(keeper) keeper.draw()
       balls[iBall].draw()
       bin.draw('front')
     } else {
       bin.draw('back')
       bin.draw('front')
+      if(keeper) keeper.draw()
       balls[iBall].draw()
     }
     wind.draw()
   }
-
-  function frame(timestamp){
+  function frame(){
     window.requestAnimationFrame(frame)
     now = Date.now()
     if (now - then > 1000/70) {
@@ -217,6 +233,8 @@ function game(){
     }
     // bin preparation
     bin = new Bin(assets.bin)
+
+    if(config.keeper) keeper = new Keeper(assets.keeper)
     // wind
     for(var i = 0; i < 150; i++){
       var min = 0
@@ -239,6 +257,18 @@ function game(){
       $canvas.height = $box.clientHeight
       $box.appendChild($canvas)
 
+      var $tries = document.createElement('div')
+      $tries.id = 'tries'
+      $box.appendChild($tries)
+
+      var $wind = document.createElement('div')
+      $wind.id = 'wind'
+      $box.appendChild($wind)
+
+      $box.style.backgroundImage = 'url(' + config.background + ')'
+      $box.style.backgroundSize = 'cover'
+      $box.style.backgroundPosition = 'center'
+
       //Events
       $canvas.addEventListener('mousedown', events.start)
       $canvas.addEventListener('mouseup', events.end)
@@ -258,7 +288,8 @@ function game(){
             })
           }
           var tempAssets = { ball: [], bin: [] };
-          (['ball','bin']).forEach(function(thing){
+          if(config.keeper) tempAssets.keeper = []
+          Object.keys(tempAssets).forEach(function(thing){
             config[thing].assets.forEach(function(src){
               var tempImg = new Image()
               loadAsset(tempImg, src).then(function(){
@@ -266,7 +297,9 @@ function game(){
                 if(
                   tempAssets.ball.length === config.ball.assets.length
                   && tempAssets.bin.length === config.bin.assets.length
-                ) resolve(tempAssets)
+                ) if(tempAssets.keeper){
+                  if(tempAssets.keeper.length === config.keeper.assets.length) resolve(tempAssets)
+                } else resolve(tempAssets)
               })
             })
           })
@@ -274,8 +307,6 @@ function game(){
       }
       getAssets().then(function(imagesData){
         assets = imagesData
-        assets.emptyBall = new Image()
-        assets.emptyBall.src = 'https://cdn.onlinewebfonts.com/svg/img_519200.png'
         resole()
       })
     })
@@ -314,10 +345,12 @@ function game(){
   Ball.prototype.checkEndTry = function(){
     var binHb = bin.getHitbox()
     if(
-      this.poz.x > binHb.l.up.x && this.poz.x < binHb.r.up.x && this.poz.y > bin.poz.y && !this.scored
+      this.poz.x > binHb.l.up.x && this.poz.x < binHb.r.up.x && this.poz.y > bin.poz.y && !this.scored && !this.finished
     ){
       this.scored = true
       score++
+      if(difficultyLevel === null) difficultyLevel = 0
+      else if(difficultyLevel < 3) difficultyLevel++
     }
     if(this.poz.y + this.radius > bin.poz.y + bin.height/2 && !this.finished){
       this.vel.y *= -0.7
@@ -361,6 +394,14 @@ function game(){
       var distance = projected.copy().sub(this.poz).magn()
       if(this.poz.y > top - this.radius){
         if(distance < this.radius && !binBounced){
+          if(
+            config.bin.type === 'front'
+            && (
+              (direction === 'l' && this.vel.x > 0)
+              || (direction === 'r' && this.vel.x < 0)
+              || this.poz.y < top || distance < this.radius/ 1.5
+            )
+          ) return
           var bounceDir = projected.copy().sub(this.poz).normalize().scale(-1)
           if(this.vel.x < 0) this.vel.x *= -1
           this.vel.y *= bounceDir.y
@@ -376,25 +417,59 @@ function game(){
 
   }
 
+  function Keeper(img){
+    this.img = img[0]
+    var w = img[0].width
+    this.width = config.keeper.width
+    this.height = this.width / (w / img[0].height)
+    this.poz = new Vector(ctx.canvas.width/2, bin.poz.y + bin.height - this.height*1.2)
+  }
+  Keeper.prototype.draw = function(type){
+    ctx.drawImage(this.img,
+      this.poz.x - this.width/2 , this.poz.y - this.height/2,
+      this.width, this.height
+    )
+  }
   function Bin(imgs){
     if(!!~imgs[0].src.indexOf('front')) this.imgs = {
       front: imgs[0], back: imgs[1]
     }
-    else this.imgs = {
+    else if(!!~imgs[0].src.indexOf('back')) this.imgs = {
       front: imgs[1], back: imgs[0]
+    }
+    else if(Object.keys(imgs).length = 1) {
+      this.imgs = {
+        front: new Image(), back: imgs[0]
+      }
+      this.imgs.front.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='
     }
     var w = imgs[0].width
     this.width = config.bin.width
     this.height = this.width / (w / imgs[0].height)
-    this.poz = new Vector(ctx.canvas.width/2, 335)
-    this.hitbox = {
-      l: {
-        up: new Vector(config.bin.hitbox.top.x, config.bin.hitbox.top.y),
-        dw: new Vector(config.bin.hitbox.bottom.x, config.bin.hitbox.bottom.y),
-      },
-      r: {
-        up: new Vector(w-config.bin.hitbox.top.x, config.bin.hitbox.top.y),
-        dw: new Vector(w-config.bin.hitbox.bottom.x, config.bin.hitbox.bottom.y)
+    if(config.bin.type === "top") this.poz = new Vector(ctx.canvas.width/2, 335)
+    else if(config.bin.type === "front") this.poz = new Vector(ctx.canvas.width/2, 230)
+    if(config.bin.hitbox){
+      this.hitbox = {
+        l: {
+          up: new Vector(config.bin.hitbox.top.x, config.bin.hitbox.top.y),
+          dw: new Vector(config.bin.hitbox.bottom.x, config.bin.hitbox.bottom.y),
+        },
+        r: {
+          up: new Vector(w-config.bin.hitbox.top.x, config.bin.hitbox.top.y),
+          dw: new Vector(w-config.bin.hitbox.bottom.x, config.bin.hitbox.bottom.y)
+        }
+      }
+    }
+    else{
+      this.hitbox = {
+        l: {
+          up: new Vector(0, balls[0].size),
+          dw: new Vector(0, imgs[0].height),
+        },
+        r: {
+          up: new Vector(w, balls[0].size),
+          dw: new Vector(w, imgs[0].height)
+        }
       }
     }
     var ratio = this.width / w
@@ -486,7 +561,4 @@ if(isIE){
   var $script = document.createElement('script')
   $script.src = 'https://cdn.polyfill.io/v2/polyfill.min.js'
   document.body.appendChild($script)
-  $script.onload = function(){ game() }
-} else {
-  window.onload = function(){ game() }
 }

@@ -13,12 +13,85 @@ html, body{
   background-color: rgb(21, 35, 45);
   overflow: hidden;
 }
-#wrapper{
+#logo img{
+  position: fixed;
+  width: 100px;
+}
+#contentWrapper{
   position: relative;
   width: 100%;
   height: 100%;
 }
+
+.buttonsHolder{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+}
+.button{
+  color: white;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  margin: 0 10px;
+  cursor: pointer;
+  user-select: none;
+  border: 1.5px solid white;
+  padding: 6px 12px;
+  border-radius: 15px;
+  transition: .2s ease-out;
+}
+.button:hover, .button.current{
+  background-color: white;
+  color: rgb(21, 35, 45);
+}
+.button:active{
+  transform: scale(1.1);
+}
+.boxHolder{
+  margin-top: -50px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* Aproximation of Box standart css */
 #box-game-panel{
+  position: relative;
+  max-width: 550px;
+  max-height: 600px;
+  width: 100%;
+  height: 100%;
+}
+/* div contaning tries bubles*/
+#tries{
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  font-family: monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+#tries div{
+  margin: 2px 5px;
+}
+#wind{
+  width: 100%;
+  text-align: center;
+  font-family: monospace;
+  font-weight: bold;
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+/* #box-game-panel{
   z-index: 0;
   position: absolute;
   top: 50%;
@@ -61,25 +134,6 @@ html, body{
   position: relative;
   user-select: none;
 }
-.tries{
-  position: absolute;
-  top: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-weight: bold;
-  font-family: monospace;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-#tries{
-  display: flex;
-  flex-wrap: wrap;
-}
-#tries div{
-  margin: 2px 5px;
-}
 .tries img:first-child{
   width: 30px;
   height: 30px;
@@ -102,16 +156,7 @@ html, body{
 #score{
   font-size: 30px;
 }
-.wind{
-  width: 100%;
-  text-align: center;
-  font-family: monospace;
-  font-weight: bold;
-  position: absolute;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-}
+
 #hitbox{
   background-color: white;
   position: fixed;
@@ -119,10 +164,4 @@ html, body{
   left: 50%;
   transform: translate(-50%);
   z-index: 5;
-}
-#logo{
-  position: fixed;
-}
-#logo img{
-  width: 100px;
-}
+} */
