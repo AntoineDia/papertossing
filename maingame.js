@@ -447,9 +447,9 @@ function game(config){
     if(this.falled){
       if(config.keeper) this.keeperColision()
       this.checkEndTry()
-      if(config.hitbox === 'top') this.checkBinColisions()
+      if(config.bin.type === 'top') this.checkBinColisions()
     }
-    if(config.hitbox === 'front') this.checkBinColisions()
+    if(config.bin.type === 'front') this.checkBinColisions()
     if(this.launched){
       if(this.scale) this.size /= 1.005
       if(this.size < 40) this.size = 40
