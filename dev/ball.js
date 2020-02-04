@@ -14,7 +14,6 @@ function Ball(config){
   this.vel = new Vector(0,0)
 }
 Ball.prototype.draw = function(game){
-  console.log('drawball !')
   var poz = game.state.ballOrigin.copy().add(this.poz)
   game.ctx.drawImage(game.assets.ball,
     poz.x - this.size/2, poz.y - this.size/2,
@@ -29,20 +28,20 @@ Ball.prototype.addF = function(f){
   return this
 }
 Ball.prototype.checkEndTry = function(){
-  var binHb = bin.getHitbox()
-  if(
-    this.poz.x > binHb.l.up.x && this.poz.x < binHb.r.up.x && this.poz.y > bin.poz.y && !this.scored && !this.finished
-  ){
-    this.scored = true
-    score++
-    if(difficultyLevel === null) difficultyLevel = 0
-    else if(difficultyLevel < 3) difficultyLevel++
-  }
-  if(this.poz.y + this.radius > bin.poz.y + bin.height/2){
-    this.vel.y *= -0.7
-    this.poz.y -= 3
-    this.finished = true
-  }
+  // var binHb = bin.getHitbox()
+  // if(
+  //   this.poz.x > binHb.l.up.x && this.poz.x < binHb.r.up.x && this.poz.y > bin.poz.y && !this.scored && !this.finished
+  // ){
+  //   this.scored = true
+  //   score++
+  //   if(difficultyLevel === null) difficultyLevel = 0
+  //   else if(difficultyLevel < 3) difficultyLevel++
+  // }
+  // if(this.poz.y + this.radius > bin.poz.y + bin.height/2){
+  //   this.vel.y *= -0.7
+  //   this.poz.y -= 3
+  //   this.finished = true
+  // }
   if(this.scored || this.finished){
     if(!this.bounced){
       setTimeout(function(){
@@ -52,19 +51,19 @@ Ball.prototype.checkEndTry = function(){
     this.bounced = true
   }
 }
-Ball.prototype.update = function(){
+Ball.prototype.update = function(game){
   if(this.vel.y > 0) this.falled = true
   if(this.falled){
-    if(config.keeper) this.keeperColision()
-    this.checkEndTry()
+    // if(game.data.keeper) this.keeperColision()
+    this.checkEndTry(game.bin)
   }
-  this.checkBinColisions()
+  // this.checkBinColisions()
   if(this.launched){
     if(this.scale) this.size /= 1.005
     if(this.size < 40) this.size = 40
     this.radius = this.size / 2
-    this.addF(forces.gravity).addF(forces.launch).addF(forces.wind)
-    forces.launch.scale(1/1.11)
+    this.addF(game.forces.gravity).addF(game.forces.launch).addF(game.forces.wind)
+    game.forces.launch.scale(1/1.11)
     this.vel.add(this.acc)
     this.poz.add(this.vel)
     this.acc.scale(0)

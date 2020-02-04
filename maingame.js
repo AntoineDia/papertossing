@@ -75,7 +75,7 @@ function game(config){
       forces.launch.y = -0.90
       forces.launch.x /= 3
       forces.initLauch = forces.launch.copy()
-      keeper.updateDest()
+      if(config.keeper) keeper.updateDest()
       balls[iBall].launch()
     }
   }
@@ -447,8 +447,9 @@ function game(config){
     if(this.falled){
       if(config.keeper) this.keeperColision()
       this.checkEndTry()
+      if(config.hitbox === 'top') this.checkBinColisions()
     }
-    this.checkBinColisions()
+    if(config.hitbox === 'front') this.checkBinColisions()
     if(this.launched){
       if(this.scale) this.size /= 1.005
       if(this.size < 40) this.size = 40

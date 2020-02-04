@@ -1,7 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 
-var devFolder = path.join(__dirname + '/server')
+var devFolder = path.join(__dirname + '/dev')
 
 fs.readdir(devFolder, (err, files) => {
   let col = ''
