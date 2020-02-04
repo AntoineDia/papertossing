@@ -7,7 +7,6 @@
   <title>Paper Toss</title>
   <link rel="stylesheet" href="./game.css">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-  <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
 </head>
 <body>
   <div id="logo">
@@ -63,33 +62,31 @@
         })
       }
       function Penalty(){
-        $box.innerHTML = ''
-        game({
-          tries: 6,
+        var game = new Game({
+          tries: 10,
           randomBall: false,
           // seeHitbox: true,
           background: './assets/bg.png',
           ball: {
             width: 80,
-            assets: ['./assets/football3.png']
+            asset: './assets/football3.png',
           },
           bin: {
             position: { x: 'center', y: 160 },
             type: 'front',
             width: 300,
-            assets: [
-              './assets/goal (1).png'
-            ],
+            asset: './assets/goal (1).png',
           },
           keeper:{
             width: 105,
-            assets: ['./assets/keeper (1).png']
+            asset: './assets/keeper (1).png'
           },
           scoreBoard: {
-            assets: ['./assets/scoreBoard.png']
+            asset: './assets/scoreBoard.png'
           },
           wind: false
         })
+        game.init()
       }
       function Basket(){
         $box.innerHTML = 'Testing'
@@ -100,7 +97,7 @@
   </div>
 
   <!-- <script src="./game.js"></script> -->
-  <script src="./dev/test.js"></script>
+  <script src="./gameBuild.js"></script>
   <!-- <script src="./gameWithClass.js"></script> -->
 </body>
 </html>

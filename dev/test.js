@@ -1,3 +1,4 @@
+/* Exemple de config */
 var config = {
   tries: 8,
   randomBall: true,
@@ -27,15 +28,17 @@ var config = {
 
 function game(config){
   'use strict';
+  var seeTrajectory = false
   var now, then, elapsed
   var score, tries
   var ctx, assets
   var balls, iBall, bin, keeper, binBounced = false, timedOut = null, endGame = false
   var difficultyLevel = null
   var forces = {
-    gravity: new Vector(0, 0.11),
+    gravity: new Vector(0, 0.12),
     wind: new Vector(0, 0),
-    launch: new Vector(0, 0)
+    launch: new Vector(0, 0),
+    initLauch: new Vector(0, 0)
   }
   var launchInfos = {
     start: new Vector(0,0),
@@ -43,6 +46,7 @@ function game(config){
   }
   var events = {
     start: function(e){
+      if(balls[iBall].launched) return
       var rect = e.target.getBoundingClientRect()
       launchInfos.start.x = (e.clientX || event.touches[0].pageX) - rect.left
       launchInfos.start.y = (e.clientY || event.touches[0].pageY) - rect.top
@@ -63,13 +67,15 @@ function game(config){
       forces.launch.normalize().scale(-1)
       var radians = forces.launch.angle()
       var deg = radians * (180/Math.PI)
-      deg = deg / 20
+      deg = deg / 10
       deg = Math.round(deg * 2) / 2
-      deg = deg * 20
+      deg = deg * 10
       radians = deg * (Math.PI/180)
       forces.launch = Vector.fromAngle(radians)
-      forces.launch.y = -1
-      forces.launch.x /= 1.8
+      forces.launch.y = -0.90
+      forces.launch.x /= 3
+      forces.initLauch = forces.launch.copy()
+      keeper.updateDest()
       balls[iBall].launch()
     }
   }
@@ -114,57 +120,69 @@ function game(config){
   setup().then(initGame)
 
   function updateDOM(){
-    var $tries = document.getElementById('tries')
-    $tries.innerHTML = ''
-    var $ballIndicator = document.createElement('div')
-    $ballIndicator.style.borderRadius = '100%'
-    $ballIndicator.style.border = '1.5px solid black'
-    for(var i = 0; i < balls.length; i++){
-      var $current = $ballIndicator.cloneNode()
-      if(i < iBall){
-        if(balls[i].scored) $current.style.backgroundColor = 'chartreuse'
-        else $current.style.backgroundColor = 'red'
-      } else if(i === iBall) {
-        $current.style.backgroundColor = 'black'
-      }
-      $current.style.width = '20px'
-      $current.style.height = '20px'
-      $tries.appendChild($current)
-    }
-    // document.getElementById('score').innerHTML = score
+    var $scoreBoard = document.getElementById('scoreBoard')
+    $scoreBoard.innerHTML = ''
 
-    var windComprenhensible = Math.abs(Math.floor(forces.wind.x * 10000) / 10)
-    if(windComprenhensible !== 0) windComprenhensible = (windComprenhensible -20) * 3
-    var txt = ''
-    switch(windComprenhensible){
-      case 0: txt = 'PAS DE VENT'
+    var $tries = document.createElement('div')
+    $tries.style.display = 'flex'
+    $tries.style.position = 'absolute'
+    $tries.style.left = '50%'
+    $tries.style.transform = 'translateX(-100%)'
+    $tries.style.marginLeft = '-35px'
+    var $ballIndicator = document.createElement('div')
+    var img = balls[iBall].img.cloneNode()
+    $ballIndicator.style.margin = '0 3px'
+    $ballIndicator.appendChild(img)
+    img.style.width = '15px'
+    img.style.height = '15px'
+    var triesLeft = document.createElement('span')
+    triesLeft.innerHTML = tries
+    $tries.appendChild(triesLeft)
+    $tries.appendChild($ballIndicator)
+
+    var $score = document.createElement('div')
+    $score.style.position = 'absolute'
+    $score.style.left = '50%'
+    $score.style.transform = 'translateX(-50%)'
+    $score.innerHTML = score
+
+    $scoreBoard.appendChild($score)
+    $scoreBoard.appendChild($tries)
+    // document.getElementById('score').innerHTML = score
+    if(config.wind){
+      var windComprenhensible = Math.abs(Math.floor(forces.wind.x * 10000) / 10)
+      if(windComprenhensible !== 0) windComprenhensible = (windComprenhensible -20) * 3
+      var txt = ''
+      switch(windComprenhensible){
+        case 0: txt = 'PAS DE VENT'
+          break;
+        case 30: txt = 'PETIT VENT'
+          break;
+        case 60: txt = 'MOYEN VENT'
+          break;
+        case 90: txt = 'GRAND VENT'
         break;
-      case 30: txt = 'PETIT VENT'
+      }
+      var $span = document.createElement('span')
+      $span.innerHTML = txt
+      var $wind = document.getElementById('wind')
+      $wind.innerHTML = ''
+      switch(windComprenhensible){
+        case 0: $span.style.fontSize = '25px'
+          break;
+        case 30: $span.style.fontSize = '30px'
+          break;
+        case 60: $span.style.fontSize = '35px'
+          break;
+        case 90: $span.style.fontSize = '40px'
         break;
-      case 60: txt = 'MOYEN VENT'
-        break;
-      case 90: txt = 'GRAND VENT'
-       break;
+      }
+      if(endGame) {
+        $span.style.fontSize = '30px'
+        $span.innerHTML = 'End Game</br> Score: ' + score
+      }
+      $wind.appendChild($span)
     }
-    var $span = document.createElement('span')
-    $span.innerHTML = txt
-    var $wind = document.getElementById('wind')
-    $wind.innerHTML = ''
-    switch(windComprenhensible){
-      case 0: $span.style.fontSize = '25px'
-        break;
-      case 30: $span.style.fontSize = '30px'
-        break;
-      case 60: $span.style.fontSize = '35px'
-        break;
-      case 90: $span.style.fontSize = '40px'
-       break;
-    }
-    if(endGame) {
-      $span.style.fontSize = '30px'
-      $span.innerHTML = 'End Game</br> Score: ' + score
-    }
-    $wind.appendChild($span)
   }
   function resetTry(){
     tries--
@@ -177,23 +195,60 @@ function game(config){
       $canvas.removeEventListener('touchend', events.end)
     }
     iBall++
-    wind.newForce()
+    if(config.wind) wind.newForce()
     updateDOM()
+  }
+  function drawTrajectories(){
+    if(balls[iBall].launched){
+      // launch events
+      ctx.beginPath()
+      ctx.lineWidth = 2
+      ctx.strokeStyle = 'red'
+      ctx.moveTo(
+        launchInfos.start.x,
+        launchInfos.start.y
+      )
+      ctx.lineTo(
+        launchInfos.end.x,
+        launchInfos.end.y
+      )
+      ctx.stroke()
+      //prosscess launch
+      ctx.beginPath()
+      ctx.strokeStyle = 'pink'
+      ctx.lineWidth = 2
+      ctx.moveTo(
+        ctx.canvas.width/2, ctx.canvas.height - config.ball.width/2 - 15
+      )
+      ctx.lineTo(
+        ctx.canvas.width/2 + forces.initLauch.copy().scale(200).x,
+        (ctx.canvas.height - config.ball.width/2 - 15) + forces.initLauch.copy().scale(200).y
+      )
+      ctx.stroke()
+    }
   }
   function draw(){
     ctx.clearRect(0,0, ctx.canvas.width, ctx.canvas.height)
     if(balls[iBall].falled){
-      bin.draw('back')
-      if(keeper) keeper.draw()
-      balls[iBall].draw()
-      bin.draw('front')
+      if(balls[iBall].scored){
+        bin.draw('back')
+        balls[iBall].draw()
+        if(keeper) keeper.draw()
+        bin.draw('front')
+      } else {
+        bin.draw('back')
+        if(keeper) keeper.draw()
+        balls[iBall].draw()
+        bin.draw('front')
+      }
     } else {
       bin.draw('back')
       bin.draw('front')
       if(keeper) keeper.draw()
       balls[iBall].draw()
     }
-    wind.draw()
+    if(config.wind)  wind.draw()
+    if(seeTrajectory) drawTrajectories()
   }
   function frame(){
     window.requestAnimationFrame(frame)
@@ -203,6 +258,9 @@ function game(config){
       if(endGame) return
       draw()
       balls[iBall].update()
+      if(config.keeper && !balls[iBall].launched) keeper.iddle()
+      if(config.keeper && balls[iBall].launched) keeper.move()
+
     }
   }
   function startLoop() {
@@ -236,15 +294,17 @@ function game(config){
 
     if(config.keeper) keeper = new Keeper(assets.keeper)
     // wind
-    for(var i = 0; i < 150; i++){
-      var min = 0
-      var maxX = ctx.canvas.width
-      var maxY = ctx.canvas.height
-      var x = Math.floor(Math.random() * (maxX - min + 1)) + min
-      var y = Math.floor(Math.random() * (maxY - min + 1)) + min
-      wind.parts.push(new Vector(x, y))
+    if(config.wind){
+      for(var i = 0; i < 150; i++){
+        var min = 0
+        var maxX = ctx.canvas.width
+        var maxY = ctx.canvas.height
+        var x = Math.floor(Math.random() * (maxX - min + 1)) + min
+        var y = Math.floor(Math.random() * (maxY - min + 1)) + min
+        wind.parts.push(new Vector(x, y))
+      }
+      wind.newForce()
     }
-    wind.newForce()
     updateDOM()
     startLoop()
   }
@@ -264,6 +324,13 @@ function game(config){
       var $wind = document.createElement('div')
       $wind.id = 'wind'
       $box.appendChild($wind)
+
+      var $scoreBoard = document.createElement('div')
+      $scoreBoard.id = 'scoreBoard'
+      $scoreBoard.style.backgroundImage = 'url(' + config.scoreBoard.assets[0] + ')'
+      $scoreBoard.style.backgroundSize = 'cover'
+      $scoreBoard.style.backgroundPosition = 'center'
+      $box.appendChild($scoreBoard)
 
       $box.style.backgroundImage = 'url(' + config.background + ')'
       $box.style.backgroundSize = 'cover'
@@ -322,18 +389,27 @@ function game(config){
     this.bounced = false
     this.finished = false
     this.scored = false
+    this.scale = true
     //vectors
-    this.poz = new Vector(ctx.canvas.width/2, ctx.canvas.height - this.size)
+    this.poz = new Vector(ctx.canvas.width/2, ctx.canvas.height - this.radius - 15)
     this.acc =  new Vector(0,0)
     this.vel = new Vector(0,0)
     //image
     this.img = img
   }
   Ball.prototype.draw = function(){
+    // ctx.save()
+    // ctx.translate(this.poz.x, this.poz.y)
+    // var vel = this.vel.copy()
+    // vel.y *= -1
+    // vel.x *= -1
+    // ctx.rotate((vel.angle()))
+    // ctx.translate(-(this.poz.x), -(this.poz.y))
     ctx.drawImage(this.img,
       this.poz.x - this.radius, this.poz.y - this.radius,
       this.size, this.size
     )
+    // ctx.restore()
   }
   Ball.prototype.launch = function(){
     this.launched = true
@@ -352,7 +428,7 @@ function game(config){
       if(difficultyLevel === null) difficultyLevel = 0
       else if(difficultyLevel < 3) difficultyLevel++
     }
-    if(this.poz.y + this.radius > bin.poz.y + bin.height/2 && !this.finished){
+    if(this.poz.y + this.radius > bin.poz.y + bin.height/2){
       this.vel.y *= -0.7
       this.poz.y -= 3
       this.finished = true
@@ -361,7 +437,7 @@ function game(config){
       if(!this.bounced){
         setTimeout(function(){
           resetTry()
-        }, 500)
+        }, 800)
       }
       this.bounced = true
     }
@@ -369,13 +445,14 @@ function game(config){
   Ball.prototype.update = function(){
     if(this.vel.y > 0) this.falled = true
     if(this.falled){
+      if(config.keeper) this.keeperColision()
       this.checkEndTry()
-      this.checkBinColisions()
     }
+    this.checkBinColisions()
     if(this.launched){
-      this.size /= 1.004;
+      if(this.scale) this.size /= 1.005
+      if(this.size < 40) this.size = 40
       this.radius = this.size / 2
-      if(this.size < 47) this.size = 47
       this.addF(forces.gravity).addF(forces.launch).addF(forces.wind)
       forces.launch.scale(1/1.11)
       this.vel.add(this.acc)
@@ -384,6 +461,7 @@ function game(config){
     }
   }
   Ball.prototype.checkBinColisions = function(){
+    // if(config.bin.type = 'front') return
     var hitbox = bin.getHitbox()
     var top = bin.poz.y + bin.hitbox.l.up.y - bin.height / 2
     for(var direction in hitbox){
@@ -394,14 +472,6 @@ function game(config){
       var distance = projected.copy().sub(this.poz).magn()
       if(this.poz.y > top - this.radius){
         if(distance < this.radius && !binBounced){
-          if(
-            config.bin.type === 'front'
-            && (
-              (direction === 'l' && this.vel.x > 0)
-              || (direction === 'r' && this.vel.x < 0)
-              || this.poz.y < top || distance < this.radius/ 1.5
-            )
-          ) return
           var bounceDir = projected.copy().sub(this.poz).normalize().scale(-1)
           if(this.vel.x < 0) this.vel.x *= -1
           this.vel.y *= bounceDir.y
@@ -416,20 +486,54 @@ function game(config){
     }
 
   }
+  Ball.prototype.keeperColision = function(){
+    if(Math.abs(this.poz.x - keeper.poz.x)< keeper.width/2 && (!this.finished && !this.scored)){
+      this.finished = true
+      this.scale = false
+      this.vel.scale(0)
+    }
+  }
 
   function Keeper(img){
+    this.dir = 1
     this.img = img[0]
     var w = img[0].width
     this.width = config.keeper.width
     this.height = this.width / (w / img[0].height)
-    this.poz = new Vector(ctx.canvas.width/2, bin.poz.y + bin.height - this.height*1.2)
+    this.poz = new Vector(ctx.canvas.width/2, bin.poz.y + bin.height - this.height*1.4)
+    this.origin = this.poz.copy()
+    this.destination = null
   }
-  Keeper.prototype.draw = function(type){
+  Keeper.prototype.draw = function(){
     ctx.drawImage(this.img,
       this.poz.x - this.width/2 , this.poz.y - this.height/2,
       this.width, this.height
     )
   }
+  Keeper.prototype.iddle = function(){
+    var l = this.origin.x -13
+    var r = this.origin.x + 13
+    this.poz.x += this.dir
+    if(this.poz.x <= l) this.dir = 1
+    if(this.poz.x > r) this.dir = -1
+  }
+  Keeper.prototype.updateDest = function(){
+    var hb = bin.getHitbox()
+    var min = hb.l.dw.x + this.width/2
+    var max = hb.r.dw.x - this.width/2
+    this.destination = Math.floor(Math.random() * (max - min + 1)) + min
+    if(this.destination > this.poz.x) this.dir = 1
+    else this.dir = -1
+    if(Math.abs(this.poz.x - this.destination) < 30) this.updateDest()
+  }
+  Keeper.prototype.move = function(){
+    // var min = hb.l.dw.x + this.width/2
+    // var max = hb.r.dw.x - this.width/2
+    // var random = Math.floor(Math.random() * (max - min + 1)) + min
+    this.poz.x += this.dir * 2
+    if(Math.abs(this.poz.x - this.destination) < 10)  this.dir = 0
+  }
+
   function Bin(imgs){
     if(!!~imgs[0].src.indexOf('front')) this.imgs = {
       front: imgs[0], back: imgs[1]
@@ -446,8 +550,12 @@ function game(config){
     var w = imgs[0].width
     this.width = config.bin.width
     this.height = this.width / (w / imgs[0].height)
-    if(config.bin.type === "top") this.poz = new Vector(ctx.canvas.width/2, 335)
-    else if(config.bin.type === "front") this.poz = new Vector(ctx.canvas.width/2, 230)
+    if(config.bin.type === "top")
+      this.poz = new Vector(ctx.canvas.width/2, 220)
+    else if(config.bin.type === "front"){
+      if(config.bin.position) this.poz = new Vector(ctx.canvas.width/2, config.bin.position.y)
+      else this.poz = new Vector(ctx.canvas.width/2, 230)
+    }
     if(config.bin.hitbox){
       this.hitbox = {
         l: {
@@ -463,11 +571,11 @@ function game(config){
     else{
       this.hitbox = {
         l: {
-          up: new Vector(0, balls[0].size),
+          up: new Vector(0, 0),
           dw: new Vector(0, imgs[0].height),
         },
         r: {
-          up: new Vector(w, balls[0].size),
+          up: new Vector(w, 0),
           dw: new Vector(w, imgs[0].height)
         }
       }
@@ -499,24 +607,12 @@ function game(config){
       ctx.strokeStyle = 'red'
       ctx.lineWidth = 2
       ctx.beginPath()
-      ctx.moveTo(
-        this.poz.x + this.hitbox.l.up.x - this.width / 2,
-        this.poz.y + this.hitbox.l.up.y - this.height / 2
-      )
-      ctx.lineTo(
-        this.poz.x + this.hitbox.l.dw.x - this.width / 2,
-        this.poz.y + this.hitbox.l.dw.y - this.height / 2,
-      )
+      ctx.moveTo(this.poz.x + this.hitbox.l.up.x - this.width / 2, this.poz.y + this.hitbox.l.up.y - this.height / 2)
+      ctx.lineTo(this.poz.x + this.hitbox.l.dw.x - this.width / 2, this.poz.y + this.hitbox.l.dw.y - this.height / 2)
       ctx.stroke()
       ctx.beginPath()
-      ctx.moveTo(
-        this.poz.x + this.hitbox.r.up.x - this.width / 2,
-        this.poz.y + this.hitbox.r.up.y - this.height / 2
-      )
-      ctx.lineTo(
-        this.poz.x + this.hitbox.r.dw.x - this.width / 2,
-        this.poz.y + this.hitbox.r.dw.y - this.height / 2,
-      )
+      ctx.moveTo(this.poz.x + this.hitbox.r.up.x - this.width / 2, this.poz.y + this.hitbox.r.up.y - this.height / 2)
+      ctx.lineTo(this.poz.x + this.hitbox.r.dw.x - this.width / 2, this.poz.y + this.hitbox.r.dw.y - this.height / 2)
       ctx.stroke()
     }
   }
