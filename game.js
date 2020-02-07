@@ -631,7 +631,7 @@ Vector.fromAngle = function(radians){
   return new Vector(Math.cos(radians), Math.sin(radians))
 }
 
-var isIE = !!window.MSInputMethodContext && !!document.documentMode
+var isIE = !!window.MSInputMethodContext && !!document.documentMode;
 if(isIE){
   var $script = document.createElement('script')
   $script.src = 'https://cdn.polyfill.io/v2/polyfill.min.js'
