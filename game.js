@@ -73,7 +73,7 @@ function game(config){
       radians = deg * (Math.PI/180)
       forces.launch = Vector.fromAngle(radians)
       forces.launch.y = -0.90
-      forces.launch.x /= 3
+      forces.launch.x /= config.trajectoryThighness
       forces.initLauch = forces.launch.copy()
       if(config.keeper) keeper.updateDest()
       balls[iBall].launch()
@@ -520,19 +520,32 @@ function game(config){
   }
   Keeper.prototype.updateDest = function(){
     var hb = bin.getHitbox()
-    var min = hb.l.dw.x + this.width/2
-    var max = hb.r.dw.x - this.width/2
-    this.destination = Math.floor(Math.random() * (max - min + 1)) + min
+    var min = hb.l.dw.x + this.width/4
+    var max = hb.r.dw.x - this.width/4
+    var ladder = max - min
+    var angleLaunch = (forces.launch.copy().scale(-1).angle() * (180/Math.PI)) -69
+
+    if(config.chances[iBall]){
+      if(angleLaunch > 20)this.destination = min + this.width /2
+      else this.destination = max - this.width /2
+    } else {
+      var added = ladder / 41 * angleLaunch
+      this.destination = min + added
+    }
+
+    console.log('angle',angleLaunch)
+    console.log('dest', this.destination)
+    console.log('min',min)
+    console.log('added', added)
+
+    // this.destination = Math.floor(Math.random() * (max - min + 1)) + min
     if(this.destination > this.poz.x) this.dir = 1
     else this.dir = -1
-    if(Math.abs(this.poz.x - this.destination) < 30) this.updateDest()
+    // if(Math.abs(this.poz.x - this.destination) < 30) this.updateDest()
   }
   Keeper.prototype.move = function(){
-    // var min = hb.l.dw.x + this.width/2
-    // var max = hb.r.dw.x - this.width/2
-    // var random = Math.floor(Math.random() * (max - min + 1)) + min
-    this.poz.x += this.dir * 2
-    if(Math.abs(this.poz.x - this.destination) < 10)  this.dir = 0
+    this.poz.x += this.dir * 3
+    if(Math.abs(this.poz.x - this.destination) <= 3)  this.dir = 0
   }
 
   function Bin(imgs){
