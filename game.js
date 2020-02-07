@@ -505,15 +505,8 @@ function game(config){
       this.destination = min + added
     }
 
-    console.log('angle',angleLaunch)
-    console.log('dest', this.destination)
-    console.log('min',min)
-    console.log('added', added)
-
-    // this.destination = Math.floor(Math.random() * (max - min + 1)) + min
     if(this.destination > this.poz.x) this.dir = 1
     else this.dir = -1
-    // if(Math.abs(this.poz.x - this.destination) < 30) this.updateDest()
   }
   Keeper.prototype.move = function(){
     this.poz.x += this.dir * 3
