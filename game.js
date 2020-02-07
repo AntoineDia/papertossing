@@ -1,31 +1,3 @@
-/* Exemple de config */
-var config = {
-  tries: 8,
-  randomBall: true,
-  seeHitbox: false,
-  ball: {
-    width: 80,
-    assets: [
-      './assets/paper.png',
-      './assets/basketball.png',
-      './assets/tennisball.png',
-      './assets/voleyball.png',
-      './assets/football.png',
-    ],
-  },
-  bin: {
-    width: 90,
-    assets: [
-      './assets/binfront.png',
-      './assets/binback.png',
-    ],
-    hitbox: {
-      top:    { x:  3, y:  39 },
-      bottom: { x: 63, y: 410 }
-    }
-  }
-}
-
 function game(config){
   'use strict';
   var seeTrajectory = false

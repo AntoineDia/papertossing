@@ -27,90 +27,87 @@
       </div>
     </div>
 
-    <script>
-      var $box = document.getElementById('box-game-panel')
-      function PaperToss(){
-        $box.innerHTML = ''
-        game({
-          tries: 8,
-          type: 'paper-toss',
-          randomBall: true,
-          seeHitbox: false,
-          trajectoryThighness: 1.8,
-          background: './assets/office.jpg',
-          ball: {
-            width: 80,
-            assets: [
-              './assets/paper.png',
-              './assets/basketball.png',
-              './assets/tennisball.png',
-              './assets/voleyball.png',
-              './assets/football.png',
-            ],
-          },
-          bin: {
-            width: 85,
-            assets: [
-              './assets/binfront.png',
-              './assets/binback.png',
-            ],
-            type: 'top',
-            hitbox: {
-              top:    { x:  3, y:  39 },
-              bottom: { x: 63, y: 410 }
-            }
-          },
-          scoreBoard: {
-            assets: ['./assets/scoreBoard.png']
-          },
-          wind:{
-            blow: true,
-            asset: './assets/wind_sprite.png'
-          }
-        })
-      }
-      function Penalty(){
-        $box.innerHTML = ''
-        game({
-          type: 'penalty',
-          tries: 6,
-          chances: [false, true, false, true, false, true],
-          randomBall: false,
-          // seeHitbox: true,
-          trajectoryThighness: 3,
-          background: './assets/bg.png',
-          ball: {
-            width: 80,
-            assets: ['./assets/football3.png']
-          },
-          bin: {
-            position: { x: 'center', y: 160 },
-            type: 'front',
-            width: 300,
-            assets: [
-              './assets/goal (1).png'
-            ],
-          },
-          keeper:{
-            width: 105,
-            assets: ['./assets/keeper (1).png']
-          },
-          scoreBoard: {
-            assets: ['./assets/scoreBoard.png']
-          },
-          wind: false
-        })
-      }
-      function Basket(){
-        $box.innerHTML = 'Testing'
-        alert('See you in the future \n youtu.be/mpMg1upld0w')
-      }
-    </script>
-
   </div>
 
-  <!-- <script src="./game.js"></script> -->
+  <script>
+    var $box = document.getElementById('box-game-panel')
+    function PaperToss(){
+      $box.innerHTML = ''
+      game({
+        tries: 8,
+        type: 'paper-toss',
+        randomBall: true,
+        seeHitbox: false,
+        trajectoryThighness: 1.8,
+        background: './assets/office.jpg',
+        ball: {
+          width: 80,
+          assets: [
+            './assets/paper.png',
+            './assets/basketball.png',
+            './assets/tennisball.png',
+            './assets/voleyball.png',
+            './assets/football.png',
+          ],
+        },
+        bin: {
+          width: 85,
+          assets: [
+            './assets/binfront.png',
+            './assets/binback.png',
+          ],
+          type: 'top',
+          hitbox: {
+            top:    { x:  3, y:  39 },
+            bottom: { x: 63, y: 410 }
+          }
+        },
+        scoreBoard: {
+          assets: ['./assets/scoreBoard.png']
+        },
+        wind:{
+          blow: true,
+          asset: './assets/wind_sprite.png'
+        }
+      })
+    }
+    function Penalty(){
+      $box.innerHTML = ''
+      game({
+        type: 'penalty',
+        tries: 6,
+        chances: [true, true, true, true, true, true],
+        randomBall: false,
+        // seeHitbox: true,
+        trajectoryThighness: 3,
+        background: './assets/bg.png',
+        ball: {
+          width: 80,
+          assets: ['./assets/football3.png']
+        },
+        bin: {
+          position: { x: 'center', y: 160 },
+          type: 'front',
+          width: 300,
+          assets: [
+            './assets/goal (1).png'
+          ],
+        },
+        keeper:{
+          width: 105,
+          assets: ['./assets/keeper (1).png']
+        },
+        scoreBoard: {
+          assets: ['./assets/scoreBoard.png']
+        },
+        wind: false
+      })
+    }
+    function Basket(){
+      $box.innerHTML = 'Testing'
+      alert('See you in the future \n youtu.be/mpMg1upld0w')
+    }
+  </script>
   <script src="./game.js"></script>
-  <!-- <script src="./gameWithClass.js"></script> -->
 </body>
 </html>
