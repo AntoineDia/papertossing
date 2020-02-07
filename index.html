@@ -35,6 +35,7 @@
           tries: 8,
           randomBall: true,
           seeHitbox: false,
+          trajectoryThighness: 1.8,
           background: './assets/office.jpg',
           ball: {
             width: 80,
@@ -47,7 +48,7 @@
             ],
           },
           bin: {
-            width: 90,
+            width: 85,
             assets: [
               './assets/binfront.png',
               './assets/binback.png',
@@ -61,7 +62,10 @@
           scoreBoard: {
             assets: ['./assets/scoreBoard.png']
           },
-          wind: true
+          wind:{
+            blow: true,
+            asset: './assets/wind_sprite.png'
+          }
         })
       }
       function Penalty(){
@@ -70,6 +74,7 @@
           tries: 6,
           randomBall: false,
           // seeHitbox: true,
+          trajectoryThighness: 3,
           background: './assets/bg.png',
           ball: {
             width: 80,

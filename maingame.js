@@ -35,7 +35,7 @@ function game(config){
   var balls, iBall, bin, keeper, binBounced = false, timedOut = null, endGame = false
   var difficultyLevel = null
   var forces = {
-    gravity: new Vector(0, 0.12),
+    gravity: new Vector(0, 0.13),
     wind: new Vector(0, 0),
     launch: new Vector(0, 0),
     initLauch: new Vector(0, 0)
@@ -130,7 +130,7 @@ function game(config){
     $tries.style.transform = 'translateX(-100%)'
     $tries.style.marginLeft = '-35px'
     var $ballIndicator = document.createElement('div')
-    var img = balls[iBall].img.cloneNode()
+    var img = (balls[iBall] || balls[0]).img.cloneNode()
     $ballIndicator.style.margin = '0 3px'
     $ballIndicator.appendChild(img)
     img.style.width = '15px'
@@ -148,41 +148,37 @@ function game(config){
 
     $scoreBoard.appendChild($score)
     $scoreBoard.appendChild($tries)
-    // document.getElementById('score').innerHTML = score
+    var $span = document.createElement('span')
+    var $wind = document.getElementById('wind')
     if(config.wind){
       var windComprenhensible = Math.abs(Math.floor(forces.wind.x * 10000) / 10)
       if(windComprenhensible !== 0) windComprenhensible = (windComprenhensible -20) * 3
-      var txt = ''
+      var zx = 0
       switch(windComprenhensible){
-        case 0: txt = 'PAS DE VENT'
+        case 0: zx = 0
           break;
-        case 30: txt = 'PETIT VENT'
+        case 30: zx = 1
           break;
-        case 60: txt = 'MOYEN VENT'
+        case 60: zx = 2
           break;
-        case 90: txt = 'GRAND VENT'
+        case 90: zx = 3
         break;
       }
-      var $span = document.createElement('span')
-      $span.innerHTML = txt
-      var $wind = document.getElementById('wind')
-      $wind.innerHTML = ''
-      switch(windComprenhensible){
-        case 0: $span.style.fontSize = '25px'
-          break;
-        case 30: $span.style.fontSize = '30px'
-          break;
-        case 60: $span.style.fontSize = '35px'
-          break;
-        case 90: $span.style.fontSize = '40px'
-        break;
-      }
-      if(endGame) {
-        $span.style.fontSize = '30px'
-        $span.innerHTML = 'End Game</br> Score: ' + score
-      }
-      $wind.appendChild($span)
+      $span.innerHTML = ''
+      $wind.style.backgroundImage = 'url(' + config.wind.asset + ')'
+      $wind.style.backgroundSize = 187.5 * 4 + 'px 100px'
+      $wind.style.backgroundRepeat = 'no-repeat'
+      $wind.style.backgroundPosition = (-(assets.wind.width / 8) * zx) + 'px top'
+      // $wind.style.backgroundPosition = 'right 100px'
+      $wind.style.width = '187.5px'
+      $wind.style.height = "100px"
     }
+    if(endGame) {
+      $span.style.fontSize = '30px'
+      $span.innerHTML = 'End Game</br> Score: ' + score
+    }
+    $wind.innerHTML = ''
+    $wind.appendChild($span)
   }
   function resetTry(){
     tries--
@@ -374,6 +370,10 @@ function game(config){
       }
       getAssets().then(function(imagesData){
         assets = imagesData
+        if(config.wind) {
+          assets.wind = new Image()
+          assets.wind.src = config.wind.asset
+        }
         resole()
       })
     })
@@ -451,7 +451,7 @@ function game(config){
     }
     if(config.bin.type === 'front') this.checkBinColisions()
     if(this.launched){
-      if(this.scale) this.size /= 1.005
+      if(this.scale) this.size /= 1.006
       if(this.size < 40) this.size = 40
       this.radius = this.size / 2
       this.addF(forces.gravity).addF(forces.launch).addF(forces.wind)
@@ -552,7 +552,7 @@ function game(config){
     this.width = config.bin.width
     this.height = this.width / (w / imgs[0].height)
     if(config.bin.type === "top")
-      this.poz = new Vector(ctx.canvas.width/2, 220)
+      this.poz = new Vector(ctx.canvas.width/2, 250)
     else if(config.bin.type === "front"){
       if(config.bin.position) this.poz = new Vector(ctx.canvas.width/2, config.bin.position.y)
       else this.poz = new Vector(ctx.canvas.width/2, 230)
