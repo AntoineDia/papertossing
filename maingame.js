@@ -32,51 +32,54 @@ function game(config){
   var now, then, elapsed
   var score, tries
   var ctx, assets
-  var balls, iBall, bin, keeper, binBounced = false, timedOut = null, endGame = false
+  var ball, balls, iBall, bin, keeper, binBounced = false, timedOut = null, endGame = false
   var difficultyLevel = null
   var forces = {
     gravity: new Vector(0, 0.13),
     wind: new Vector(0, 0),
     launch: new Vector(0, 0),
-    initLauch: new Vector(0, 0)
   }
-  var launchInfos = {
-    start: new Vector(0,0),
-    end: new Vector(0,0)
+  var toss = { from: new Vector(0,0), to: new Vector(0,0) }
+  function getEventCoord(event){
+    var x, y
+    var rect = event.target.getBoundingClientRect()
+    switch(event.type){
+      case 'mousedown': case 'mouseup':
+        x = event.clientX
+        y = event.clientY
+        break;
+      case 'touchstart':
+        x = event.touches[0].pageX
+        y = event.touches[0].pageY
+        break;
+      case 'touchend':
+        x = event.changedTouches[0].pageX
+        y = event.changedTouches[0].pageY
+    }
+    x -= rect.left
+    y -= rect.top
+    return new Vector(x, y)
   }
-  var events = {
-    start: function(e){
-      if(balls[iBall].launched) return
-      var rect = e.target.getBoundingClientRect()
-      launchInfos.start.x = (e.clientX || event.touches[0].pageX) - rect.left
-      launchInfos.start.y = (e.clientY || event.touches[0].pageY) - rect.top
-      if(launchInfos.start.copy().sub(balls[iBall].poz).magn() > balls[iBall].radius){
-        launchInfos.start.scale(0)
-      }
+  var eventHandler = {
+    startToss: function(e){
+      if(ball.launched) return
+      toss.from = getEventCoord(e)
+      var isInBallRange = toss.from.sub(ball.poz).magn() < ball.radius()
+      if(!isInBallRange) toss.from.scale(0)
     },
-    end: function(e){
-      if(launchInfos.start.magn() === 0) return
-      var rect = e.target.getBoundingClientRect()
-      launchInfos.end.x = (e.clientX || event.changedTouches[0].pageX) - rect.left
-      launchInfos.end.y = (e.clientY || event.changedTouches[0].pageY) - rect.top
-      if(
-        launchInfos.start.x - launchInfos.end.x === 0
-        && launchInfos.start.y - launchInfos.end.y === 0
-      ) return
-      forces.launch = launchInfos.start.copy().sub(launchInfos.end)
-      forces.launch.normalize().scale(-1)
-      var radians = forces.launch.angle()
-      var deg = radians * (180/Math.PI)
-      deg = deg / 10
-      deg = Math.round(deg * 2) / 2
-      deg = deg * 10
-      radians = deg * (Math.PI/180)
-      forces.launch = Vector.fromAngle(radians)
+    endToss: function(e){
+      if(toss.from.magn() === 0 || ball.launched) return
+      toss.to = getEventCoord(e)
+      var difference = toss.to.sub(toss.from)
+      if(difference.magn() === 0) return
+      var tossAngleRadiant = difference.angle()
+      var tossAngleDegrees = tossAngleRadiant * (180/Math.PI)
+      var correctedAngle = Math.round(tossAngleDegrees / 10) * 10
+      forces.launch = Vector.fromAngle(correctedAngle * (Math.PI/180))
       forces.launch.y = -0.90
-      forces.launch.x /= 3
-      forces.initLauch = forces.launch.copy()
+      forces.launch.x /= config.trajectoryThighness
       if(config.keeper) keeper.updateDest()
-      balls[iBall].launch()
+      ball.launch()
     }
   }
   var wind = {
@@ -635,7 +638,8 @@ Vector.prototype.magn = function () {
   return Math.sqrt(this.x * this.x + this.y * this.y)
 }
 Vector.prototype.sub = function(vect){
-  this.x -= vect.x; this.y -= vect.y; return this
+  // this.x -= vect.x; this.y -= vect.y; return this
+  return new Vector(this.x -= vect.x, this.y -= vect.y)
 }
 Vector.prototype.normalize = function(){
   this.scale(1/this.magn()); return this

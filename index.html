@@ -73,7 +73,7 @@
         game({
           tries: 6,
           randomBall: false,
-          // seeHitbox: true,
+          seeHitbox: true,
           trajectoryThighness: 3,
           background: './assets/bg.png',
           ball: {
@@ -85,8 +85,12 @@
             type: 'front',
             width: 300,
             assets: [
-              './assets/goal (1).png'
+              './assets/goal.png'
             ],
+            // hitbox: {
+            //   top:    { x:  58, y:  5 },
+            //   bottom: { x: 20, y: 305 }
+            // }
           },
           keeper:{
             width: 105,
